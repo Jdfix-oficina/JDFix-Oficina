@@ -2,30 +2,23 @@ import streamlit as st
 import firebase_admin
 from firebase_admin import credentials, firestore
 
-# ==============================================================================
-# INICIALIZAÇÃO INTELIGENTE DO FIREBASE (NUVEM + LOCAL)
-# ==============================================================================
+# Inicialização inteligente do Firebase (Nuvem + Local)
 if not firebase_admin._apps:
     if "firebase" in st.secrets:
-        # Configuração para o Streamlit Cloud (Lê os Secrets guardados na nuvem)
         firebase_secrets = dict(st.secrets["firebase"])
-        # Corrige automaticamente as quebras de linha da chave privada do TOML
         firebase_secrets["private_key"] = firebase_secrets["private_key"].replace("\\n", "\n")
         cred = credentials.Certificate(firebase_secrets)
     else:
-        # Configuração para o teu PC Local (Usa o ficheiro da pasta)
         cred = credentials.Certificate("credentials.json")
         
     firebase_admin.initialize_app(cred)
 
-# Ligação oficial à Base de Dados (O resto do teu código usa esta variável 'db')
 db = firestore.client()
-# ==============================================================================
-# ==========================================
-# INSTALAÇÃO FORÇADA E AUTOMÁTICA DO GERADOR DE PDF
-# ==========================================
-try:
-    from fpdf import FPDF
+
+# Importação correta do gerador de PDF
+from fpdf import FPDF
+
+# DAQUI PARA BAIXO SEGUE O TEU CÓDIGO NORMAL DA OFICINA...
 except ImportError:
     subprocess.check_call([sys.executable, "-m", "pip", "install", "fpdf"])
     os.execl(sys.executable, sys.executable, *sys.argv)
