@@ -1,7 +1,23 @@
-import sys
-import subprocess
-import os
+import streamlit as st
+import firebase_admin
+from firebase_admin import credentials, firestore
 
+# Inicialização inteligente do Firebase (Nuvem + Local)
+if not firebase_admin._apps:
+    if "firebase" in st.secrets:
+        # Se estiver no Streamlit Cloud, lê os Secrets que colámos acima
+        firebase_secrets = dict(st.secrets["firebase"])
+        # Corrige as quebras de linha da chave privada automaticamente
+        firebase_secrets["private_key"] = firebase_secrets["private_key"].replace("\\n", "\n")
+        cred = credentials.Certificate(firebase_secrets)
+    else:
+        # Se estiver no teu PC local, continua a ler o ficheirocredentials.json da pasta
+        cred = credentials.Certificate("credentials.json")
+        
+    firebase_admin.initialize_app(cred)
+
+# Ligação à Base de Dados
+db = firestore.client()
 # ==========================================
 # INSTALAÇÃO FORÇADA E AUTOMÁTICA DO GERADOR DE PDF
 # ==========================================
